@@ -82,8 +82,8 @@
     dnsovertls = "true";
   };
 
-  services.mullvad-vpn.enable = true;
-  services.mullvad-vpn.package = pkgs.mullvad-vpn;
+  # Proton VPN (WireGuard) needs loose reverse-path filtering to work with the NixOS firewall
+  networking.firewall.checkReversePath = "loose";
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin";
@@ -170,8 +170,12 @@
 
     firefox
 
-    mullvad-vpn
-    mullvad
+    protonvpn-gui
+    proton-pass
+
+    onlyoffice-desktopeditors
+    kdePackages.okular
+
     mullvad-browser
 
     btop
