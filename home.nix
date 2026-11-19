@@ -22,6 +22,7 @@ in
     ./modules/git.nix
     ./modules/bash.nix
     ./modules/dev.nix
+    ./modules/claude-code.nix
   ];
 
   home.username = "user";
