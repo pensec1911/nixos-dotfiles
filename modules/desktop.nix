@@ -18,6 +18,9 @@
   # needed for GTK settings / dark mode written via home-manager dconf
   programs.dconf.enable = true;
 
+  # slock needs a setuid wrapper, otherwise it aborts immediately
+  programs.slock.enable = true;
+
   environment.systemPackages = with pkgs; [
     networkmanagerapplet # nm-applet + nm-connection-editor
     wireplumber          # wpctl for volume keys

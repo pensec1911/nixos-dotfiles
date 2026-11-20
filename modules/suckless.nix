@@ -19,7 +19,6 @@
     #(pkgs.scroll.overrideAttrs (_: {
     #  src = ../config/scroll;
     #}))
-    slock
     #surf
   ];
 }
