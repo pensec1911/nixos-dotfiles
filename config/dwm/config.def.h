@@ -2,7 +2,7 @@
 #include <X11/XF86keysym.h>
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayonleft = 0;    /* 0: systray in the right corner, >0: systray on left of status text */
@@ -16,13 +16,14 @@ static const unsigned int gappov    = 30;       /* vert outer gap between window
 static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10" };
-static const char dmenufont[]       = "monospace:size=10";
-static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
+static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=10", "monospace:size=10" };
+static const char dmenufont[]       = "JetBrainsMono Nerd Font:size=10";
+/* Tokyo-Night-artiges Farbschema */
+static const char col_gray1[]       = "#1a1b26"; /* bar background      */
+static const char col_gray2[]       = "#2f3549"; /* inactive border     */
+static const char col_gray3[]       = "#a9b1d6"; /* normal text         */
+static const char col_gray4[]       = "#1a1b26"; /* text on selection   */
+static const char col_cyan[]        = "#7aa2f7"; /* selection / accent  */
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
@@ -30,7 +31,8 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+/* 1 term, 2 web, 3 code, 4 files, 5 chat, 6 music, 7 docs, 8 media, 9 misc */
+static const char *tags[] = { "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  " };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -96,7 +98,7 @@ static const char *voldowncmd[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@
 static const char *volmutecmd[] = { "wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
 static const char *micmutecmd[] = { "wpctl", "set-mute", "@DEFAULT_AUDIO_SOURCE@", "toggle", NULL };
 static const char *shotcmd[]    = { "flameshot", "gui", NULL };
-static const char *lockcmd[]    = { "slock", NULL };
+static const char *lockcmd[]    = { "lock", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */

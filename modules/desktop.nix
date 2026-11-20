@@ -18,8 +18,14 @@
   # needed for GTK settings / dark mode written via home-manager dconf
   programs.dconf.enable = true;
 
-  # slock needs a setuid wrapper, otherwise it aborts immediately
-  programs.slock.enable = true;
+  # screen locker: i3lock-color (also sets up the PAM service "i3lock")
+  programs.i3lock = {
+    enable = true;
+    package = pkgs.i3lock-color;
+  };
+
+  # icon font for dwm bar, dmenu and slstatus
+  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
 
   environment.systemPackages = with pkgs; [
     networkmanagerapplet # nm-applet + nm-connection-editor
@@ -27,5 +33,25 @@
     libnotify            # notify-send
     arandr               # monitor layout GUI
     seahorse             # GUI for the keyring
+
+    # `lock`: blurred screenshot + clock, colors match dwm (Mod+Shift+x)
+    (writeShellScriptBin "lock" ''
+      exec ${i3lock-color}/bin/i3lock-color \
+        --blur 8 \
+        --clock --indicator \
+        --time-str "%H:%M" --date-str "%A, %d.%m.%Y" \
+        --time-size 64 --date-size 20 \
+        --time-color eeeeeeff --date-color eeeeeeff \
+        --inside-color 22222299 --ring-color 005577ff \
+        --insidever-color 22222299 --ringver-color 3399ccff \
+        --insidewrong-color 22222299 --ringwrong-color cc3333ff \
+        --keyhl-color 3399ccff --bshl-color cc3333ff \
+        --line-uses-inside --separator-color 00000000 \
+        --verif-color eeeeeeff --wrong-color eeeeeeff \
+        --verif-text "..." --wrong-text "falsch" --noinput-text "leer" \
+        --radius 120 --ring-width 8 \
+        --ignore-empty-password --show-failed-attempts \
+        "$@"
+    '')
   ];
 }
