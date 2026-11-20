@@ -23,6 +23,7 @@ in
     ./modules/bash.nix
     ./modules/dev.nix
     ./modules/claude-code.nix
+    ./modules/desktop-home.nix
   ];
 
   home.username = "user";
