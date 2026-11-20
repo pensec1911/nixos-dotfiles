@@ -10,6 +10,8 @@
       ./hardware-configuration.nix
       ./modules/virt.nix
       ./modules/desktop.nix
+      ./modules/statusbar.nix
+      ./modules/laptop.nix
     ];
 
   # Bootloader.
@@ -60,27 +62,16 @@
       };
     };
   };
-#  networking.wireguard.interfaces.wg0 = {
-#    ips = [ "10.100.0.3/24" ];
-#    privateKeyFile = "/home/user/.wireguard/laptop_private.key";
-  
-#    peers = [
-#      {
-#        publicKey = "e3EfbIfVT80/khEt9DWHU9SqvM04Jm9KCR8ZCSQ69UA=";
-#        allowedIPs = [ "192.168.0.0/16" "10.100.0.0/24" ];
-#        endpoint = "[2003:c2:2f28:b594:1491:a0f:18ac:52ab]:51820";
-#        persistentKeepalive = 25;
-#      }
-#    ];
-#  };
   networking.nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
 
   services.resolved = {
     enable = true;
-    dnssec = "true";
-    domains = [ "~." ];
-    fallbackDns = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
-    dnsovertls = "true";
+    settings.Resolve = {
+      DNSSEC = "true";
+      Domains = [ "~." ];
+      FallbackDNS = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+      DNSOverTLS = "true";
+    };
   };
 
   # Proton VPN (WireGuard) needs loose reverse-path filtering to work with the NixOS firewall
@@ -134,20 +125,23 @@
     autoRepeatInterval = 35;
     windowManager.dwm = {
       enable = true;
-      package = pkgs.dwm.overrideAttrs {
+      package = pkgs.dwm.overrideAttrs (old: {
         src = ./config/dwm;
-      };
+        # swallow patch needs the X-Resource extension (xcb-res) for window PIDs
+        buildInputs = old.buildInputs ++ [ pkgs.libxcb ];
+      });
     };
   };
 
-  #nixpkgs.overlays = [
-  #  (final: prev: {
-  #    slstatus = prev.slstatus.overrideAttrs (old: {
-  #      src = ./config/slstatus;
-  #      buildInputs = old.buildInputs or [];
-  #    });
-  #  })
-  #];
+  # slstatus with our config.h, defined once here; home-manager uses the same
+  # pkgs (useGlobalPkgs), so home.nix starts exactly this build.
+  nixpkgs.overlays = [
+    (final: prev: {
+      slstatus = prev.slstatus.override {
+        conf = builtins.readFile ./config/slstatus/config.h;
+      };
+    })
+  ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -171,8 +165,8 @@
 
     firefox
 
-    protonvpn-gui
-    proton-pass
+    pkgs-unstable.proton-vpn
+    pkgs-unstable.proton-pass
 
     onlyoffice-desktopeditors
     kdePackages.okular
@@ -180,9 +174,8 @@
     mullvad-browser
 
     btop
-    (slstatus.override {
-      conf = builtins.readFile ./config/slstatus/config.h;
-    })
+    slstatus
+    nvd
   ]); 
 #  ++ 
 #  (with pkgs-unstable; [
@@ -190,6 +183,31 @@
 #  ]);
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # keep the 119G disk from filling up with old generations
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+  nix.settings.auto-optimise-store = true;   # hardlink identical store files
+  boot.loader.grub.configurationLimit = 10;  # max. entries in the boot menu
+
+  # compressed swap in RAM (no swap partition on this machine)
+  zramSwap.enable = true;
+
+  # firmware updates (BIOS/EC/...): `fwupdmgr refresh && fwupdmgr update`
+  services.fwupd.enable = true;
+
+  # nh: `nh os switch` rebuilds this flake and shows a diff of what changed
+  # (the nrs alias uses it); nvd (in systemPackages) compares generations
+  programs.nh = {
+    enable = true;
+    flake = "/home/user/nixos-dotfiles";
+  };
+
+  # the classic command-not-found needs channels; nix-index (home.nix) replaces it
+  programs.command-not-found.enable = false;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

@@ -66,12 +66,13 @@ static const char unknown_str[] = "n/a";
  */
 static const struct arg args[] = {
 	/* function format                argument */
-	{ wifi_essid,     " %s",              "wlp1s0" },
+	{ wifi_essid,     "\x01" " %s",              "wlp1s0" },
 	{ wifi_perc,      " %s%%   ",              "wlp1s0" },
-	{ cpu_perc,       " %s%%   ",        NULL     },
-	{ ram_used,       " %s   ",          NULL     },
-	{ battery_perc,   " %s%%",            "BAT0"   },
+	{ cpu_perc,       "\x02" " %s%%   ",        NULL     },
+	{ ram_used,       "\x03" " %s   ",          NULL     },
+	{ run_command,    "\x06" "󰕾 %s   ",          "wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{ if ($3 == \"[MUTED]\") print \"mute\"; else printf \"%d%%\", $2 * 100 + 0.5 }'" },
+	{ battery_perc,   "\x04" " %s%%",            "BAT0"   },
 	{ battery_perc,   " / %s%%",               "BAT1"   },
 	{ battery_state,  " %s   ",                "BAT1"   },
-	{ datetime,       "%s ",                   " %a %d.%m.    %H:%M" },
+	{ datetime,       "\x05" "%s ",                   " %a %d.%m.    %H:%M" },
 };

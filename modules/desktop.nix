@@ -24,8 +24,31 @@
     package = pkgs.i3lock-color;
   };
 
-  # icon font for dwm bar, dmenu and slstatus
-  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+  # icon font for dwm bar, dmenu and slstatus; Noto as fallback so websites
+  # and notifications have glyphs for every script and emoji
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    noto-fonts
+    noto-fonts-color-emoji
+    noto-fonts-cjk-sans
+  ];
+
+  # desktop portal: proper GTK file dialogs for Firefox, Electron apps, ...
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = "gtk";
+  };
+
+  # OpenSnitch: per-application outbound firewall. The UI (started in
+  # desktop-home.nix) pops up for each new connection; rules are kept in
+  # /var/lib/opensnitch/rules.
+  services.opensnitch = {
+    enable = true;
+    # the eBPF monitor is a kernel module that does not build against
+    # linuxPackages_latest (7.x) yet; "proc" works on any kernel
+    settings.ProcMonitorMethod = "proc";
+  };
 
   environment.systemPackages = with pkgs; [
     networkmanagerapplet # nm-applet + nm-connection-editor

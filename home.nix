@@ -8,7 +8,7 @@ let
   };
 
   direnvMap = {
-    "htb" = "pentest";
+    # "htb" = "pentest";
     # "code/opentofu-IaC" = "iac";
     # "code/ansible-opnsense" = "iac";
     # "code/k8s-IaC" = "iac";
@@ -24,6 +24,7 @@ in
     ./modules/dev.nix
     ./modules/claude-code.nix
     ./modules/desktop-home.nix
+    ./modules/cli.nix
   ];
 
   home.username = "user";
@@ -56,6 +57,7 @@ in
     [ -f "$HASHFILE" ] && STORED_HASH=$(${pkgs.coreutils}/bin/cat "$HASHFILE")
 
     if [ "$CURRENT_HASH" = "$STORED_HASH" ]; then
+      :
       ${lib.concatMapStringsSep "\n" (dir:
         ''$DRY_RUN_CMD ${pkgs.direnv}/bin/direnv allow "$HOME/${dir}" 2>/dev/null || true''
       ) (builtins.attrNames direnvMap)}
@@ -72,7 +74,7 @@ in
   xsession = {
     enable = true;
     initExtra = ''
-      ${pkgs.slstatus.override { conf = builtins.readFile ./config/slstatus/config.h; }}/bin/slstatus &
+      ${pkgs.slstatus}/bin/slstatus &   # overlay with our config.h, see configuration.nix
     '';
   };
 
